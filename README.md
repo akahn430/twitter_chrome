@@ -1,6 +1,6 @@
 # Twitter Feed Blocker (Chrome Extension)
 
-A Chrome extension that hides distracting X/Twitter surfaces and keeps you focused on:
+A minimal Chrome extension that hides the X/Twitter **home feed** while still letting you use:
 
 - Notifications (`/notifications`)
 - Messages / chat (`/messages`)

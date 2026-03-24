@@ -24,6 +24,13 @@
     return window.location.pathname.replace(/\/$/, "") || "/";
   }
 
+  function getOwnHandle() {
+    const profileLink = document.querySelector('a[data-testid="AppTabBar_Profile_Link"][href]');
+    if (!profileLink) return null;
+    const path = new URL(profileLink.href, window.location.origin).pathname;
+    return path.split('/').filter(Boolean)[0] || null;
+  }
+
   function isHomeFeedPage() {
     return HOME_PATHS.has(getPath());
   }
@@ -38,7 +45,13 @@
     const first = `/${segments[0]}`;
     if (NON_PROFILE_ROUTES.has(first)) return false;
 
-    return /^[A-Za-z0-9_]{1,15}$/.test(segments[0]);
+    const possibleHandle = segments[0];
+    const ownHandle = getOwnHandle();
+    if (ownHandle && possibleHandle.toLowerCase() === ownHandle.toLowerCase()) {
+      return false;
+    }
+
+    return /^[A-Za-z0-9_]{1,15}$/.test(possibleHandle);
   }
 
   function removeExistingGate() {
@@ -48,9 +61,10 @@
 
   function hideRightRail() {
     document
-      .querySelectorAll('[data-testid="sidebarColumn"], [aria-label="Timeline: Trending now"], [aria-label="Timeline: Explore"]')
+      .querySelectorAll('[data-testid="sidebarColumn"], [aria-label="Timeline: Trending now"], [aria-label="Timeline: Explore"], [data-testid="trend"], [data-testid="UserCell"]')
       .forEach((node) => {
-        node.style.display = "none";
+        const container = node.closest('section, div[data-testid="cellInnerDiv"], aside, div') || node;
+        container.style.display = "none";
       });
 
     document
@@ -69,16 +83,16 @@
       });
   }
 
-  function addSettingsShortcut(nav) {
-    if (nav.querySelector('a[href="/settings"]')) return;
+  function ensureSidebarShortcut(nav, href, text, className) {
+    if (nav.querySelector(`a[href="${href}"]`)) return;
 
     const wrapper = document.createElement("div");
     wrapper.className = "tfb-settings-item";
 
     const link = document.createElement("a");
-    link.href = "/settings";
-    link.className = "tfb-settings-link";
-    link.textContent = "Settings";
+    link.href = href;
+    link.className = className;
+    link.textContent = text;
 
     wrapper.appendChild(link);
     nav.appendChild(wrapper);
@@ -97,10 +111,10 @@
       "AppTabBar_Profile_Link"
     ]);
 
-    nav.querySelectorAll('a[href]').forEach((link) => {
-      const href = new URL(link.href, window.location.origin).pathname;
-      const testId = link.getAttribute("data-testid") || "";
-      const label = (link.textContent || "").trim().toLowerCase();
+    nav.querySelectorAll('a[href], button').forEach((item) => {
+      const href = item.tagName === 'A' ? new URL(item.href, window.location.origin).pathname : '';
+      const testId = item.getAttribute("data-testid") || "";
+      const label = (item.textContent || item.getAttribute('aria-label') || "").trim().toLowerCase();
 
       const allowedByPath =
         href.startsWith("/notifications") ||
@@ -109,18 +123,19 @@
 
       const isProfile = testId === "AppTabBar_Profile_Link" || label === "profile";
       const isAllowed = allowedByPath || allowedTestIds.has(testId) || isProfile;
-      const isMore = label === "more" || href.startsWith("/i/");
+      const isMore = label === "more" || href.startsWith("/i/") || testId.includes("AppTabBar_More");
+      const isLogo = label === "x" || testId.includes("TopNavBar") || href === "/home";
 
-      if (!isAllowed || isMore) {
-        const container = link.closest('li, div[role="button"], a') || link;
+      if (!isAllowed || isMore || isLogo) {
+        const container = item.closest('li, div[role="button"], a, button') || item;
         container.style.display = "none";
       }
     });
 
-    addSettingsShortcut(nav);
+    ensureSidebarShortcut(nav, '/messages', 'Chat', 'tfb-settings-link');
+    ensureSidebarShortcut(nav, '/settings', 'Settings', 'tfb-settings-link');
 
-    // Hide large "Post" compose buttons in left nav area.
-    nav.parentElement?.querySelectorAll('[data-testid="SideNav_NewTweet_Button"], [data-testid="tweetButton"]')
+    nav.parentElement?.querySelectorAll('[data-testid="SideNav_NewTweet_Button"], [data-testid="tweetButton"], [aria-label="Post"], [aria-label="Tweet"], button[aria-label="More"], [data-testid="caret"]')
       .forEach((btn) => {
         btn.style.display = "none";
       });
@@ -145,10 +160,10 @@
       gate.id = "tfb-feed-gate";
       gate.innerHTML = `
         <h2>Feed blocked</h2>
-        <p>Home feed, post box, trending/news/live, and profile views are hidden.</p>
+        <p>Home feed, post box, trending/news/live, and other profiles are hidden.</p>
         <div class="tfb-actions">
           <a href="/notifications">Open Notifications</a>
-          <a href="/messages">Open Messages</a>
+          <a href="/messages">Open Chat</a>
           <a href="/settings">Open Settings</a>
         </div>
       `;

@@ -3,7 +3,7 @@
 A Chrome extension that hides distracting X/Twitter surfaces and keeps you focused on:
 
 - Notifications (`/notifications`)
-- Messages / chat (`/messages`)
+- Chat (`/messages`)
 - Profile (`/<your_handle>`)
 - Settings (`/settings`)
 
@@ -11,6 +11,10 @@ A Chrome extension that hides distracting X/Twitter surfaces and keeps you focus
 
 - Home feed timeline
 - Post prompt / composer text box
+- Right-side discovery modules such as **Live on X**, **Who to follow**, and **What's happening**
+- Other users' profile pages (your own profile remains viewable)
+- Left sidebar/nav items except **Notifications**, **Chat**, **Profile**, and **Settings**
+- X logo, More option (three dots), and make-post button
 - Right-rail discovery content (news, trending, live)
 - Profile pages (so clicking a name from chat won't open profile content)
 - Left sidebar/nav items except **Notifications**, **Chat**, **Profile**, and **Settings**

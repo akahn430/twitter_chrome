@@ -5,6 +5,23 @@ A minimal Chrome extension that hides the X/Twitter **home feed** while still le
 - Notifications (`/notifications`)
 - Messages / chat (`/messages`)
 
+## What is blocked
+
+- Home feed timeline
+- Post prompt / composer text box
+- Right-rail discovery content (news, trending, live)
+- Profile pages (so clicking a name from chat won't open profile content)
+
+## Chat list on "home"
+
+Yes. The extension is configured to redirect Home (`/` and `/home`) to `/messages`, so your chat list opens immediately.
+
+If you want to disable this, edit `content.js` and set:
+
+```js
+const REDIRECT_HOME_TO_MESSAGES = false;
+```
+
 ## Install in Chrome
 
 ### Option A: Load unpacked directly from this repo
@@ -28,13 +45,6 @@ This generates local artifacts (not committed):
 - `build/twitter-feed-blocker/` (staging folder)
 
 Then unzip `dist/twitter-feed-blocker-chrome.zip` and load that unzipped folder via **Load unpacked**.
-
-## What it does
-
-- Runs on `twitter.com` and `x.com`
-- Detects when you are on Home (`/` or `/home`)
-- Hides timeline/feed elements in the main column
-- Shows a simple panel with quick links to Notifications and Messages
 
 ## Notes
 

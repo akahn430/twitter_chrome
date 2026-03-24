@@ -18,7 +18,6 @@
   ]);
 
   // Set to true to use Messages as your effective homepage.
-  // This gives you your chat list right away without opening the Messages tab manually.
   const REDIRECT_HOME_TO_MESSAGES = true;
 
   function getPath() {
@@ -34,8 +33,6 @@
     if (NON_PROFILE_ROUTES.has(path)) return false;
     if (path.startsWith("/messages") || path.startsWith("/notifications")) return false;
 
-    // Match simple profile routes like /username and /username/with_replies.
-    // Exclude obvious non-profile app sections.
     const segments = path.split("/").filter(Boolean);
     if (segments.length === 0) return false;
     const first = `/${segments[0]}`;
@@ -72,6 +69,63 @@
       });
   }
 
+  function addSettingsShortcut(nav) {
+    if (nav.querySelector('a[href="/settings"]')) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "tfb-settings-item";
+
+    const link = document.createElement("a");
+    link.href = "/settings";
+    link.className = "tfb-settings-link";
+    link.textContent = "Settings";
+
+    wrapper.appendChild(link);
+    nav.appendChild(wrapper);
+  }
+
+  function keepSidebarOnlyCore() {
+    const nav =
+      document.querySelector('nav[aria-label="Primary"]') ||
+      document.querySelector('nav[aria-label="Primary navigation"]');
+
+    if (!nav) return;
+
+    const allowedTestIds = new Set([
+      "AppTabBar_Notifications_Link",
+      "AppTabBar_DirectMessage_Link",
+      "AppTabBar_Profile_Link"
+    ]);
+
+    nav.querySelectorAll('a[href]').forEach((link) => {
+      const href = new URL(link.href, window.location.origin).pathname;
+      const testId = link.getAttribute("data-testid") || "";
+      const label = (link.textContent || "").trim().toLowerCase();
+
+      const allowedByPath =
+        href.startsWith("/notifications") ||
+        href.startsWith("/messages") ||
+        href.startsWith("/settings");
+
+      const isProfile = testId === "AppTabBar_Profile_Link" || label === "profile";
+      const isAllowed = allowedByPath || allowedTestIds.has(testId) || isProfile;
+      const isMore = label === "more" || href.startsWith("/i/");
+
+      if (!isAllowed || isMore) {
+        const container = link.closest('li, div[role="button"], a') || link;
+        container.style.display = "none";
+      }
+    });
+
+    addSettingsShortcut(nav);
+
+    // Hide large "Post" compose buttons in left nav area.
+    nav.parentElement?.querySelectorAll('[data-testid="SideNav_NewTweet_Button"], [data-testid="tweetButton"]')
+      .forEach((btn) => {
+        btn.style.display = "none";
+      });
+  }
+
   function hideHomeTimeline() {
     const timeline = document.querySelector('[aria-label="Timeline: Your Home Timeline"]');
     if (timeline) {
@@ -95,6 +149,7 @@
         <div class="tfb-actions">
           <a href="/notifications">Open Notifications</a>
           <a href="/messages">Open Messages</a>
+          <a href="/settings">Open Settings</a>
         </div>
       `;
       primaryColumn.prepend(gate);
@@ -139,6 +194,7 @@
 
   function apply() {
     maybeRedirectHomeToMessages();
+    keepSidebarOnlyCore();
 
     if (isProfilePage()) {
       hideProfilePage();

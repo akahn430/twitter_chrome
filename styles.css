@@ -25,7 +25,8 @@
   flex-wrap: wrap;
 }
 
-#tfb-feed-gate a {
+#tfb-feed-gate a,
+.tfb-settings-link {
   display: inline-flex;
   padding: 10px 14px;
   border-radius: 999px;
@@ -35,6 +36,11 @@
   color: rgb(29, 155, 240);
 }
 
-#tfb-feed-gate a:hover {
+#tfb-feed-gate a:hover,
+.tfb-settings-link:hover {
   background: rgba(29, 155, 240, 0.08);
+}
+
+.tfb-settings-item {
+  margin: 8px 0 0 12px;
 }

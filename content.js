@@ -17,6 +17,7 @@
     "/help"
   ]);
 
+  // Set to true to use Messages as your effective homepage.
   const REDIRECT_HOME_TO_MESSAGES = true;
 
   function getPath() {

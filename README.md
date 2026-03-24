@@ -15,6 +15,10 @@ A Chrome extension that hides distracting X/Twitter surfaces and keeps you focus
 - Other users' profile pages (your own profile remains viewable)
 - Left sidebar/nav items except **Notifications**, **Chat**, **Profile**, and **Settings**
 - X logo, More option (three dots), and make-post button
+- Right-rail discovery content (news, trending, live)
+- Profile pages (so clicking a name from chat won't open profile content)
+- Left sidebar/nav items except **Notifications**, **Chat**, **Profile**, and **Settings**
+- The **More** option in the left sidebar
 
 ## Chat list on "home"
 
